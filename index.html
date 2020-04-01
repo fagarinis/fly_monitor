@@ -19,37 +19,31 @@
     </nav>
 
     <div class="container">
-        <div class="page-header">
-            <h3>Fly Monitor</h3>
-        </div>
 
-
-        <div name="divBottone" class="container mb-4">
+        <div name="divBottone" class="container mb-4 mt-4">
             <div class="row">
-
-                <div class="col col-lg-6">
-                    
-                </div>
+                <div class="col col-lg-6"></div>
 
                 <div class="col col-lg-5">
                     <span name="spinner" id="spinner" style="display:none">
                         <div class="wings"></div>
                         <span class="arc"></span>
                         <span class="arc2"></span>
+                        <div class="circle"></div>
+                        <font name="spinner" style="display:none" color="white">Caricamento Dati<span class="one">.</span><span class="two">.</span><span class="three">.</span></font>
                     </span>
                     
                 </div>
 
                 <div class="col col-lg-1">
-                    <button type="button" onclick="list()" class="btn btn-primary btn-lg pull-right">LIST</button>
-
+                    <button id="listButtonId" type="button" onclick="listCreated()" class="btn btn-primary btn-lg pull-right">LIST</button>
                 </div>
+
             </div>
             <div class="row">
                 <div class="col col-lg-5"></div>
                 <div class="col col-lg-4">
-                    <font name="spinner" style="display:none" color="white">Caricamento Dati...</font>
-                </div>
+                      </div>
                 <div class="col col-lg-3"></div>
             </div>
         </div>
@@ -58,15 +52,15 @@
 
         <div name=divCards>
             <div class="card border-primary mb-3">
-                <div class="card-header">Created</div>
+                <div class="card-header bg-primary">Created</div>
                 <div class="card-body text-primary">
-                    <table class="table table-borderless table-hover table-sm" id ="createdInProgressTableId"></table>
+                    <table class="table table-borderless table-hover table-sm" id ="createdTableId"></table>
                 </div>
             </div>
 
 
             <div class="card border-success mb-3">
-                <div class="card-header">Landed/Flying</div>
+                <div class="card-header bg-success">Landed/Flying </div>
                 <div class="card-body text-success">
                     <table class="table table-borderless table-hover table-sm" id ="landedTableId"></table>
                 </div>
@@ -80,9 +74,10 @@
 
 </html>
 
-<script src="js/fly_monitor-table.builder.js"></script>
-<script src="js/fly_monitor-ajax.js"></script>
-
 <script src="js/jquery-1.10.2.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/bootstrap.bundle.js"></script>
+
+<!-- js using jquery -->
+<script src="js/fly_monitor-table.builder.js"></script>
+<script src="js/fly_monitor-ajax.js"></script>

@@ -1,15 +1,20 @@
 
-var activeCalls = 0;
+//refresh tabella Landed/Flying
+const REFRESH_TIME = 20000 
+var autoRefresh = setInterval(listLanded, REFRESH_TIME);
 
-const REFRESH_TIME = 5000 //ogni quanti ms si refreshano le tabelle
-var autoRefresh;
+$(document).ready(function () {
+	listLanded();
+});
 
-function doCall(typeRequest, urlPath, parametri, callbackOnSuccess, callbackOnError) {
+function doCall(typeRequest, urlPath, parametri, callbackOnSuccess, callbackOnError, isSpinnerShown) {
 	const HOST = 'http://212.237.32.76:3001';
 	const AJAX_TIMEOUT = 10000;
 
-	activeCalls++;
-	showSpinner();
+	if (isSpinnerShown) {
+		showSpinner();
+	}
+
 	$.ajax({
 		url: HOST + urlPath,
 		type: typeRequest,
@@ -19,27 +24,31 @@ function doCall(typeRequest, urlPath, parametri, callbackOnSuccess, callbackOnEr
 		success: callbackOnSuccess,
 		error: callbackOnError,
 		complete: function () {
-			activeCalls--;
-			hideSpinner(1000);
+			if (isSpinnerShown) {
+				hideSpinner(1000);
+			}
 		},
 		timeout: AJAX_TIMEOUT
 	});
 }
 
-function isBlank(str) {
-	return (!str || /^\s*$/.test(str));
+function listCreated() {
+	$("#listButtonId").prop("disabled",true);
+	doCall('GET', '/list', undefined, function (resultJson) {
+		buildCreatedTable(resultJson);
+		$("#listButtonId").prop("disabled",false);
+	}, 
+	function(){
+		$("#listButtonId").prop("disabled",false);
+	}, 
+	
+	true);
 }
 
-function list() {
-	doCall('GET', '/list', undefined, function (resultJson) {
-		buildCreatedInProgressTable(resultJson);
-	});
-
+function listLanded() {
 	doCall('GET', '/status', undefined, function (resultJson) {
 		buildLandedTable(resultJson);
 	});
-
-	setAutoRefresh(true);
 }
 
 function showSpinner() {
@@ -47,9 +56,6 @@ function showSpinner() {
 }
 
 function hideSpinner(hideDelay) {
-	if (activeCalls > 0) {
-		return;
-	}
 	var spinner = $("[name='spinner']");
 	setTimeout(function () {
 		spinner.hide()
@@ -57,23 +63,14 @@ function hideSpinner(hideDelay) {
 }
 
 function fly(buttonHTML) {
-	setAutoRefresh(false);
-	console.log("vola id: " + buttonHTML.id);
 	var id = buttonHTML.id;
+	clearInterval(autoRefresh);
+
+	//remove row
+	buttonHTML.parentElement.parentElement.remove();
 
 	doCall('GET', '/start/' + id, undefined, function (resultJson) {
-		console.log(resultJson)
-		list();
+		listLanded();
+		autoRefresh = setInterval(listLanded, REFRESH_TIME);
 	})
 }
-
-function setAutoRefresh(activateAutoRefresh) {
-	if (activateAutoRefresh) {
-		clearInterval(autoRefresh);
-		autoRefresh = setInterval(list, REFRESH_TIME)
-	}
-	else {
-		clearInterval(autoRefresh);
-	}
-}
-
