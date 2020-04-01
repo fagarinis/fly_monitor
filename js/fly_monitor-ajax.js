@@ -1,6 +1,5 @@
-
 //refresh tabella Landed/Flying
-const REFRESH_TIME = 20000 
+const REFRESH_TIME = 20000
 var autoRefresh = setInterval(listLanded, REFRESH_TIME);
 
 $(document).ready(function () {
@@ -33,16 +32,17 @@ function doCall(typeRequest, urlPath, parametri, callbackOnSuccess, callbackOnEr
 }
 
 function listCreated() {
-	$("#listButtonId").prop("disabled",true);
+	clearErroreVolo();
+
+	$("#listButtonId").prop("disabled", true);
 	doCall('GET', '/list', undefined, function (resultJson) {
 		buildCreatedTable(resultJson);
-		$("#listButtonId").prop("disabled",false);
-	}, 
-	function(){
-		$("#listButtonId").prop("disabled",false);
-	}, 
-	
-	true);
+		$("#listButtonId").prop("disabled", false);
+	},
+		function () {
+			$("#listButtonId").prop("disabled", false);
+		},
+		true);
 }
 
 function listLanded() {
@@ -62,15 +62,35 @@ function hideSpinner(hideDelay) {
 	}, hideDelay);
 }
 
-function fly(buttonHTML) {
-	var id = buttonHTML.id;
+function fly(voloId) {
+	clearErroreVolo();
 	clearInterval(autoRefresh);
 
-	//remove row
-	buttonHTML.parentElement.parentElement.remove();
+	doCall('GET', '/start/' + voloId, undefined,
+		function (resultJson) { //success
+			getCreatedTableRow(voloId).remove();
+			listLanded();
+			autoRefresh = setInterval(listLanded, REFRESH_TIME);
+		},
+		function (xhr, textStatus) { //error
+			if (xhr.status == 422) { //nel caso l'aereo e' gia' partito
+				setErroreVolo('errore di sincronizzazione: Volo [ID: ' + voloId + '] gia partito');
+				getCreatedTableRow(voloId).remove();
+			}
+			listLanded();
+			autoRefresh = setInterval(listLanded, REFRESH_TIME);
+		}
+	)
+}
 
-	doCall('GET', '/start/' + id, undefined, function (resultJson) {
-		listLanded();
-		autoRefresh = setInterval(listLanded, REFRESH_TIME);
-	})
+function setErroreVolo(error) {
+	$('#erroreVoloId').html(error);
+}
+
+function clearErroreVolo() {
+	setErroreVolo('');
+}
+
+function getCreatedTableRow(voloId) {
+	return $('tr[data-voloId =' + voloId + ']');
 }

@@ -1,13 +1,10 @@
 function buildCreatedTable(resultJson) {
 	clearCreatedTable();
-	var resultTable = $("#createdTableId");
+	let resultTable = $("#createdTableId");
 
-	var resultRowsString = "";
-	for (var i = 0; i < resultJson.length; i++) {
-		resultRowsString += buildCreatedTableRow(resultJson[i]);
+	for (let i = 0; i < resultJson.length; i++) {
+		resultTable.append(buildCreatedTableRow(resultJson[i]));
 	}
-
-	resultTable.append(resultRowsString);
 }
 
 function clearCreatedTable() {
@@ -15,27 +12,27 @@ function clearCreatedTable() {
 }
 
 function buildCreatedTableRow(jsonEntry) {
-	id = jsonEntry._id;
-	tratta = jsonEntry.tratta;
-	status = jsonEntry.status;
+	let { _id, tratta, status } = jsonEntry;
 
 	if (status.toUpperCase() == 'CREATED') {
 		status = createFlyButton(jsonEntry._id);
 	}
 
-	var tableRow = '<tr>';
-	tableRow += '<td><small>' + id + '</small></td>';
-	tableRow += '<td><small>' + tratta + '</small></td>';
-	tableRow += '<td>' + status + '</td>';
-	tableRow += '</tr>';
+	let tableRow = $('<tr>').attr('data-voloId', _id).addClass('row');
+
+	[_id, tratta, status].forEach(param =>
+		tableRow.append($('<td>').addClass('col col-2').append($('<small>').html(param))));
 
 	return tableRow;
 }
 
 function createFlyButton(idVolo) {
-	var flyButton = ' <button type="button" id="' + idVolo + '" ';
-	flyButton += ' onclick="fly(this)" ';
-	flyButton += ' class="btn btn-sm btn-success"><small>FLY</small></button> ';
+	var flyButton = $('<button>');
+
+	flyButton.data('idVolo', idVolo).addClass('btn btn-sm btn-success').html('FLY');
+	flyButton.click(function () {
+		fly(idVolo);
+	});
 
 	return flyButton;
 }
@@ -45,16 +42,13 @@ function buildLandedTable(resultJson) {
 	clearLandedTable();
 	var resultTable = $("#landedTableId");
 
-	resultJson = resultJson.sort(function(a, b){
-		return (b.status == 'FLYING') - (a.status == 'FLYING');
+	resultJson = resultJson.sort(function (a, b) {
+		return (new Date(b.startDate)) - (new Date(a.startDate));
 	});
 
-	var resultRowsString = "";
 	for (var i = 0; i < resultJson.length; i++) {
-		resultRowsString += buildLandedTableRow(resultJson[i]);
+		resultTable.append(buildLandedTableRow(resultJson[i]));
 	}
-
-	resultTable.append(resultRowsString);
 }
 
 function clearLandedTable() {
@@ -62,19 +56,17 @@ function clearLandedTable() {
 }
 
 function buildLandedTableRow(jsonEntry) {
-	id = jsonEntry._id;
-	tratta = jsonEntry.tratta;
-	status = jsonEntry.status;
+	let { _id, tratta, status, startDate, endDate } = jsonEntry;
 
 	if (status.toUpperCase() == 'FLYING') {
+		//add ... animation
 		status += '<span class="one">.</span><span class="two">.</span><span class="three">.</span> &#9992;';
 	}
 
-	var tableRow = '<tr>';
-	tableRow += '<td><small>' + id + '</small></td>';
-	tableRow += '<td><small>' + tratta + '</small></td>';
-	tableRow += '<td>' + status + '</td>';
-	tableRow += '</tr>';
+	let tableRow = $('<tr>').addClass('row');
+
+	[_id, tratta, status, startDate, endDate].forEach(param =>
+		tableRow.append($('<td>').addClass('col col-2').append($('<small>').html(param))));
 
 	return tableRow;
 }
