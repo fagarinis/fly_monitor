@@ -47,7 +47,7 @@ function listCreated() {
 
 function listLanded() {
 	doCall('GET', '/status', undefined, function (resultJson) {
-		buildLandedTable(resultJson);
+		buildLandedTable(resultJson, memorizedCurrentPage);
 	});
 }
 
