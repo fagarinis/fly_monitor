@@ -47,7 +47,7 @@ function listCreated() {
 
 function listLanded() {
 	doCall('GET', '/status', undefined, function (resultJson) {
-		buildLandedTable(resultJson, memorizedCurrentPage, undefined, memorizedSelectedPageGroup);
+		buildLandedTable(resultJson, memorizedCurrentPage, undefined);
 	});
 }
 
