@@ -1,5 +1,5 @@
 //refresh tabella Landed/Flying
-const REFRESH_TIME = 20000
+const REFRESH_TIME = 20000;
 var autoRefresh = setInterval(listLanded, REFRESH_TIME);
 
 $(document).ready(function () {
@@ -22,8 +22,8 @@ function doCall(typeRequest, urlPath, parametri, callbackOnSuccess, callbackOnEr
 		dataType: "json",
 		success: callbackOnSuccess,
 		error: callbackOnError,
-		complete: function () {
-			if (isSpinnerShown) {
+		complete: function (jqXHR, textStatus) {
+			if (isSpinnerShown && textStatus !="pending") {
 				hideSpinner(1000);
 			}
 		},

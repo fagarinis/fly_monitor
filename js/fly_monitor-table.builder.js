@@ -40,7 +40,7 @@ function createFlyButton(idVolo) {
 	return flyButton;
 }
 
-function buildLandedTable(resultJson, page = 1, pageSize = 10) {
+function buildLandedTable(resultJson, selectedPage = 1, pageSize = 10) {
 	clearLandedTable();
 	var resultTable = $("#landedTableId");
 
@@ -49,11 +49,10 @@ function buildLandedTable(resultJson, page = 1, pageSize = 10) {
 		memorizedLandedResultJson = resultJson;
 	}
 	else {
-		
 		resultJson = memorizedLandedResultJson;
 	}
 
-	let startIndex = (page - 1) * pageSize;
+	let startIndex = (selectedPage - 1) * pageSize;
 	let endIndex = startIndex + pageSize;
 	for (let i = startIndex; i < resultJson.length && i < endIndex; i++) {
 		resultTable.append(buildLandedTableRow(resultJson[i]));
@@ -62,10 +61,13 @@ function buildLandedTable(resultJson, page = 1, pageSize = 10) {
 	let totalRows = resultJson.length;
 	let totalPages = Math.ceil(totalRows / pageSize);
 
-	buildLandedTableNavigationSection(totalPages, page);
+	buildLandedTableNavigationSection(totalPages, selectedPage);
 }
 
 function selectPage(page){
+	if(page == null){
+		return;
+	}
 	memorizedCurrentPage = page;
 	$("nav[aria-label = landedTableNavigation] ul li[value ="+page+"]").addClass('active');
 }
@@ -76,20 +78,34 @@ function sortJsonByStartDate(json){
 	});
 }
 
-function buildLandedTableNavigationSection(totalPages, selectedPage) {
+function buildLandedTableNavigationSection(totalPages, selectedPage, pageGroup = 1, pageGroupSize = 9) {
+	$("nav[aria-label = landedTableNavigation]").remove();
+
 	let navigationSection = $("<nav>").attr('aria-label', 'landedTableNavigation');
 	let list = $('<ul>').addClass('pagination pagination-sm');
 	navigationSection.append(list);
 
-	for (let i = 1; i <= totalPages; i++) {
+	//pageGroup - pagine 
+	// 1, 1 - 9
+	// 2, 10 - 18
+	// 3, 19 - 27
+	// 4, 28 - 36
+	
+	//BUG startPage negativa!
+	let startPage = 1 + pageGroupSize * (pageGroup - 1) ;
+	let endPage = pageGroupSize * pageGroup;
+	
+	list.append(createChangePageGroupButton('&laquo;', pageGroup-1, totalPages));
+	for (let i = startPage; i <= totalPages && i <= endPage; i++) {
 		let listItem = $("<li>").addClass('page-item').val(i);
-		listItem.append($('<a>').addClass('page-link p-1').html(i))
+		listItem.append($('<a>').addClass('page-link').html(i));
 		listItem.click(function () {
 			buildLandedTable(undefined, i);
 		});
 
 		list.append(listItem);
 	}
+	list.append(createChangePageGroupButton('&raquo;', pageGroup-1, totalPages));
 
 	$("#landedTableId").after(navigationSection);
 	selectPage(selectedPage);
@@ -97,9 +113,17 @@ function buildLandedTableNavigationSection(totalPages, selectedPage) {
 	return navigationSection;
 }
 
+function createChangePageGroupButton(innerHTML, pageGroupOnClick, totalPages){
+	let button = $("<li>").addClass('page-item').append($('<a>').addClass('page-link').html(innerHTML));
+	button.click(function(){
+		buildLandedTableNavigationSection(totalPages, undefined, pageGroupOnClick);
+	});
+
+	return button;
+}
+
 function clearLandedTable() {
 	$("#landedTableId").empty();
-	$("nav[aria-label = landedTableNavigation]").remove();
 }
 
 function buildLandedTableRow(jsonEntry) {
@@ -108,13 +132,16 @@ function buildLandedTableRow(jsonEntry) {
 	let tableRow = $('<tr>').addClass('row');
 
 	if (status.toUpperCase() == 'FLYING') {
-		//add ... animation
 		tableRow.addClass('bg-success');
-		status += '<span class="one">.</span><span class="two">.</span><span class="three">.</span> &#9992;';
+		status += tripleDotAnimation() + '&#9992;'; 
 	}
 
 	[_id, tratta, status, startDate, endDate].forEach(param =>
 		tableRow.append($('<td>').addClass('col col-2').append($('<small>').html(param))));
 
 	return tableRow;
+}
+
+function tripleDotAnimation(){
+	return '<span class="one">.</span><span class="two">.</span><span class="three">.</span> '
 }
