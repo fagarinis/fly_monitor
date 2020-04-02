@@ -88,7 +88,6 @@ function buildLandedTableNavigationSection(totalPages, selectedPage, pageGroupSi
 	
 	let startPage = Math.max(1, selectedPage - Math.ceil(pageGroupSize/2));
 	let endPage = Math.min(totalPages, startPage + pageGroupSize);
-	console.log(startPage, endPage);
 
 	let numberOfPagesShown = endPage - startPage
 	if(numberOfPagesShown < pageGroupSize){
