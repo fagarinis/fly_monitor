@@ -89,10 +89,10 @@ function buildLandedTableNavigationSection(totalPages, selectedPage, pageGroup =
 	memorizedSelectedPageGroup = pageGroup;
 
 	let navigationSection = $("<nav>").attr('aria-label', 'landedTableNavigation');
-	let list = $('<ul>').addClass('pagination pagination-sm');
+	let list = $('<ul>').addClass('pagination ');
 	navigationSection.append(list);
 
-	//pageGroup - pagine 
+	//pageGroup, pagine  (pageGroupSize = 9)
 	// 1, 1 - 9
 	// 2, 10 - 18
 	// 3, 19 - 27
@@ -127,7 +127,7 @@ function createChangePageGroupButton(innerHTML, pageGroupOnClick, totalPages, pa
 
 	let button = $("<li>").addClass('page-item').append($('<a>').addClass('page-link').html(innerHTML));
 	button.click(function(){
-		buildLandedTableNavigationSection(totalPages, undefined, pageGroupOnClick);
+		buildLandedTableNavigationSection(totalPages, memorizedCurrentPage, pageGroupOnClick);
 	});
 
 	return button;
